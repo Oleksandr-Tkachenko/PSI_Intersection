@@ -1,0 +1,70 @@
+/* 
+ * File:   main.c
+ * Author: Oleksandr Tkachenko <oleksandr.tkachenko at crisp-da.de>
+ *
+ * Created on May 5, 2016, 12:52 AM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <string.h>
+
+#include "psi_structures.h"
+#include "psi_bucketed_intersection.h"
+
+int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx);
+
+/*
+ * 
+ */
+int main(int argc, char** argv) {
+    PSI_INTERSECTION_CTX ctx[1];
+    ctx->result = NULL;
+    parse_argv(argc, argv, ctx);
+    psi_bucketed_intersection(ctx);
+    return (EXIT_SUCCESS);
+}
+
+int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
+    int index, c;
+    opterr = 0;
+    while ((c = getopt(argc, argv, "p:e:b:q:r:s:t:")) != -1)
+        switch (c) {
+            case 'e':
+                ctx->element_pow = atoi(optarg);
+                break;
+            case 'p':
+                strncpy(ctx->path_root, optarg, 128);
+                break;
+            case 'b':
+                ctx->bucket_n = atoi(optarg);
+                break;
+            case 'q':
+                ctx->queue_buffer_size = atoi(optarg);
+                break;
+            case 'r':
+                ctx->read_buffer_size = atoi(optarg);
+                break;
+            case 's':
+                strncpy(ctx->path_folder_buckets, optarg, 128);
+                break;
+            case 't':
+                ctx->threads = atoi(optarg);
+                break;
+            case '?':
+                if (isprint(optopt))
+                    fprintf(stderr, "Unknown option `-%c'.\n", optopt);
+                else
+                    fprintf(stderr,
+                        "Unknown option character `\\x%x'.\n",
+                        optopt);
+                exit(EXIT_FAILURE);
+            default:
+                abort();
+        }
+
+    for (index = optind; index < argc; index++)
+        printf("Non-option argument %s\n", argv[index]);
+}
