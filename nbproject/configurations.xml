@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>psi_bucketed_intersection.h</itemPath>
-      <itemPath>psi_intersection.h</itemPath>
       <itemPath>psi_simple_intersection.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -17,7 +16,6 @@
                    projectFiles="true">
       <itemPath>main.c</itemPath>
       <itemPath>psi_bucketed_intersection.c</itemPath>
-      <itemPath>psi_intersection.c</itemPath>
       <itemPath>psi_simple_intersection.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -49,6 +47,7 @@
             <pElem>/usr/lib/x86_64-linux-gnu/glib-2.0/include</pElem>
           </incDir>
           <commandLine>-fopenmp</commandLine>
+          <warningLevel>2</warningLevel>
         </cTool>
         <linkerTool>
           <linkerLibItems>
@@ -65,10 +64,6 @@
       <item path="psi_bucketed_intersection.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="psi_bucketed_intersection.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="psi_intersection.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="psi_intersection.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="psi_simple_intersection.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -100,10 +95,6 @@
       <item path="psi_bucketed_intersection.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="psi_bucketed_intersection.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="psi_intersection.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="psi_intersection.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="psi_simple_intersection.c" ex="false" tool="0" flavor2="0">
       </item>

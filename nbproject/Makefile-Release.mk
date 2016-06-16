@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/psi_bucketed_intersection.o \
-	${OBJECTDIR}/psi_intersection.o \
 	${OBJECTDIR}/psi_simple_intersection.o
 
 
@@ -74,11 +73,6 @@ ${OBJECTDIR}/psi_bucketed_intersection.o: psi_bucketed_intersection.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_bucketed_intersection.o psi_bucketed_intersection.c
-
-${OBJECTDIR}/psi_intersection.o: psi_intersection.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_intersection.o psi_intersection.c
 
 ${OBJECTDIR}/psi_simple_intersection.o: psi_simple_intersection.c 
 	${MKDIR} -p ${OBJECTDIR}

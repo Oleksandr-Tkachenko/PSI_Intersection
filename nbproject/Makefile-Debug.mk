@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/psi_bucketed_intersection.o \
-	${OBJECTDIR}/psi_intersection.o \
 	${OBJECTDIR}/psi_simple_intersection.o
 
 
@@ -70,22 +69,17 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/psi_intersection: ${OBJECTFILES}
 ${OBJECTDIR}/main.o: main.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -Wall -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
 ${OBJECTDIR}/psi_bucketed_intersection.o: psi_bucketed_intersection.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_bucketed_intersection.o psi_bucketed_intersection.c
-
-${OBJECTDIR}/psi_intersection.o: psi_intersection.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_intersection.o psi_intersection.c
+	$(COMPILE.c) -g -Wall -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_bucketed_intersection.o psi_bucketed_intersection.c
 
 ${OBJECTDIR}/psi_simple_intersection.o: psi_simple_intersection.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_simple_intersection.o psi_simple_intersection.c
+	$(COMPILE.c) -g -Wall -I../PSI_Util -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/psi_simple_intersection.o psi_simple_intersection.c
 
 # Subprojects
 .build-subprojects:

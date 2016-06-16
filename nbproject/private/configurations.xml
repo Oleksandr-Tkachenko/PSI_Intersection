@@ -13,6 +13,8 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -24,21 +26,20 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 5 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 6 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 7 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 50000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 7 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 7 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 5000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 8 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 5000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 8 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e 8 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
-          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 8 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
-          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 7 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/media/alex/TOSHIBA EXT/PSI/" -a "/media/alex/TOSHIBA EXT/PSI/A/1000" -b "/media/alex/TOSHIBA EXT/PSI/B/1000" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/A/1000" -b "/home/alex/Work/server/B/1000" -s "/home/alex/Work/server/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/A/1000" -b "/home/alex/Work/server/B/1000" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/A/10000" -b "/home/alex/Work/server/B/10000" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/A/100000" -b "/home/alex/Work/server/B/100000" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/A/1000000" -b "/home/alex/Work/server/B/1000000" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 16 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/res_a" -b "/home/alex/Work/server/B/res_b" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 32 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/res_a" -b "/home/alex/Work/server/B/res_b" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
+          <runcommandpicklistitem>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 32 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/res_a" -b "/home/alex/Work/server/res_b" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 7 -p "/media/alex/TOSHIBA EXT/PSI/" -s "/media/alex/TOSHIBA EXT/PSI/buckets/" -b 1000 -q 10000 -r 10000 -t 4</runcommand>
+        <runcommand>/usr/bin/time -f "User time %U \nSystem time %S \nElapsed time %E \nCPU %P\n" "${OUTPUT_PATH}" -e 32 -p "/home/alex/Work/server/" -a "/home/alex/Work/server/res_a" -b "/home/alex/Work/server/res_b" -s "/home/alex/Work/server/buckets/" -n 1000 -q 10000 -r 10000 -t 4</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
-        <console-type>2</console-type>
         <terminal-type>1</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
