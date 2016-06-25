@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
     int index, c;
     opterr = 0;
-    while ((c = getopt(argc, argv, "p:e:n:q:r:s:t:a:b:")) != -1)
+    while ((c = getopt(argc, argv, "l:p:e:n:q:r:s:t:a:b:")) != -1)
         switch (c) {
             case 'e':
                 ctx->element_size = atoi(optarg);
@@ -40,6 +40,10 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
                 break;
             case 'n':
                 ctx->bucket_n = atoi(optarg);
+                break;
+            case 'l':
+                ctx->lookup = TRUE;
+                strncpy(ctx->path_lookup, optarg, 128);
                 break;
             case 'q':
                 ctx->queue_buffer_size = atoi(optarg);
@@ -73,6 +77,6 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
 
     for (index = optind; index < argc; index++)
         printf("Non-option argument %s\n", argv[index]);
-        
-        return 0;
+
+    return 0;
 }

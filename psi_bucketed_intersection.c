@@ -30,6 +30,9 @@ void psi_bucketed_intersection(PSI_INTERSECTION_CTX* ctx) {
     }
     free(ctx->queues);
     slice_free_byte_buffer(&(ctx->buffer), ctx->read_buffer_size, ctx->element_size);
+
+    if (ctx->lookup)
+        psi_intersection_lookup(ctx);
 }
 
 void psi_split_into_buckets(PSI_INTERSECTION_CTX* ctx) {
@@ -87,7 +90,7 @@ void psi_buckets_intersection(PSI_INTERSECTION_CTX* ctx) {
         simple_ctx->result = NULL;
         strncpy(simple_ctx->path_a, path_a, 64);
         strncpy(simple_ctx->path_b, path_b, 64);
-        
+
         simple_ctx->element_size = ctx->element_size;
 
         psi_simple_intersection(simple_ctx);
@@ -102,7 +105,7 @@ void psi_buckets_intersection(PSI_INTERSECTION_CTX* ctx) {
     if (g_slist_length(ctx->result) == 0)
         printf("No elements in intersection\n");
     else {
-        printf("%d elements in intersection\n", g_slist_length(ctx->result));
+        printf("%u elements in intersection\n", g_slist_length(ctx->result));
         FILE * f = fopen(ctx->path_result, "w");
         if (f == NULL)
             printf("Error writing result to file\n");
@@ -172,13 +175,63 @@ void psi_destroy_buckets(PSI_INTERSECTION_CTX* ctx) {
 void show_settings(PSI_INTERSECTION_CTX* ctx) {
     printf("\n");
     printf("Number of buckets : %zu\n", ctx->bucket_n);
-    printf("Element size : %u\n", ctx->element_size);
+    printf("Element size : %u\n", (uint) ctx->element_size);
     printf("Path A : %s\n", ctx->path_a);
     printf("Path B : %s\n", ctx->path_b);
     printf("Path root : %s\n", ctx->path_root);
     printf("Path folder buckets : %s\n", ctx->path_folder_buckets);
     printf("Queue buffer size : %zu\n", ctx->queue_buffer_size);
     printf("Read buffer size : %zu\n", ctx->read_buffer_size);
-    printf("Number of threads : %u\n", ctx->threads);
+    printf("Number of threads : %u\n", (uint) ctx->threads);
+    if (ctx->lookup) {
+        printf("Lookup : Yes\n");
+        printf("Path lookup : %s\n", ctx->path_lookup);
+    } else
+        printf("Lookup : No\n");
     printf("\n");
+}
+
+void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
+    GSList * l = NULL;
+    FILE * res = psi_try_fopen(ctx->path_result, "rb");
+    FILE * lookup = psi_try_fopen(ctx->path_lookup, "rb");
+    char tmp[140], lookup_buf[33];
+    strncpy(tmp, ctx->path_root, 128);
+    strcat(tmp, "res_true");
+    printf("Writing true intersection elements to %s\n", tmp);
+    FILE * true_res = psi_try_fopen(tmp, "wb");
+
+    GHashTable * t = g_hash_table_new(g_str_hash, g_str_equal);
+    uint8_t elem[ctx->element_size], hash[16];
+    while (1) {
+        char * c_buf = (char*) malloc(33 * sizeof*c_buf);
+        if (fread(c_buf, 32, 1, res) < 1)
+            break;
+        fseeko(res, 1, SEEK_CUR);
+        c_buf[32] = '\0';
+        if (!hash_table_insert(t, c_buf))
+            printf("Collision by inserting new element to hash table %s\n", c_buf);
+    }
+    while (fread(elem, ctx->element_size, 1, lookup) > 0) {
+        get_16_bit_sha256(elem, hash);
+        bytes_to_chars(hash, lookup_buf, 16);
+        lookup_buf[32] = '\0';
+        if (is_in_hash_table(t, lookup_buf)) {
+            char * res = (char*) malloc((ctx->element_size * 2 + 1) * sizeof*res);
+            bytes_to_chars(elem, res, ctx->element_size);
+            l = psi_lookup_add_to_list(l, res, ctx->element_size);
+        }
+    }
+    printf("Got %u elements\n", g_slist_length(l));
+    g_slist_foreach(l, (GFunc) psi_write_and_show, true_res);
+}
+
+GSList * psi_lookup_add_to_list(GSList * l, char * elem, uint8_t e_size) {
+    return g_slist_prepend(l, elem);
+}
+
+void psi_write_and_show(char * elem, FILE * f) {
+    if (fwrite(elem, strlen(elem), 1, f) < 1)
+        printf("Error writing to result_true\n");
+    printf("%s\n", elem);
 }
