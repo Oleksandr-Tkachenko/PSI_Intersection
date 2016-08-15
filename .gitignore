@@ -1,5 +1,0 @@
-psi-cuckoo-hashing
-*.o
-.git*
-.dep.inc
-nbproject/*
