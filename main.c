@@ -20,6 +20,10 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx);
  * 
  */
 int main(int argc, char** argv) {
+if(argc==1){
+printf("PSI Intersection\n");
+return(EXIT_FAILURE);
+}
     PSI_INTERSECTION_CTX ctx[1];
     ctx->result = NULL;
     parse_argv(argc, argv, ctx);
