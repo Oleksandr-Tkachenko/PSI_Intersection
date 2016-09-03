@@ -1,7 +1,6 @@
 #include "psi_bucketed_intersection.h"
 
 void psi_bucketed_intersection(PSI_INTERSECTION_CTX* ctx) {
-    snprintf(ctx->path_result, 128, "%sres_intersection", ctx->path_root);
 
     show_settings(ctx);
     //ctx->buffer = slice_alloc_byte_buffer_new(ctx->read_buffer_size, ctx->element_size);
@@ -83,8 +82,6 @@ void psi_buckets_intersection(PSI_INTERSECTION_CTX* ctx) {
         char path_b[64];
         snprintf(path_a, 64, "%sa%zu", ctx->path_folder_buckets, i);
         snprintf(path_b, 64, "%sb%zu", ctx->path_folder_buckets, i);
-        //snprintf(path_a, 64, "%s", ctx->path_folder_buckets);
-        //snprintf(path_b, 64, "%s", ctx->path_folder_buckets);
 
         PSI_SIMPLE_INTERSECTION_CTX simple_ctx[1];
         simple_ctx->result = NULL;
@@ -178,8 +175,8 @@ void show_settings(PSI_INTERSECTION_CTX* ctx) {
     printf("Element size : %u\n", (uint) ctx->element_size);
     printf("Path A : %s\n", ctx->path_a);
     printf("Path B : %s\n", ctx->path_b);
-    printf("Path root : %s\n", ctx->path_root);
     printf("Path folder buckets : %s\n", ctx->path_folder_buckets);
+    printf("Path result : %s\n", ctx->path_result);
     printf("Queue buffer size : %zu\n", ctx->queue_buffer_size);
     printf("Read buffer size : %zu\n", ctx->read_buffer_size);
     printf("Number of threads : %u\n", (uint) ctx->threads);
@@ -196,8 +193,8 @@ void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
     FILE * res = psi_try_fopen(ctx->path_result, "rb");
     FILE * lookup = psi_try_fopen(ctx->path_lookup, "rb");
     char tmp[140], lookup_buf[33];
-    strncpy(tmp, ctx->path_root, 128);
-    strcat(tmp, "res_true");
+    strncat(tmp, ctx->path_result, 120);
+    strcat(tmp, "_res_true");
     printf("Writing true intersection elements to %s\n", tmp);
     FILE * true_res = psi_try_fopen(tmp, "wb");
 
@@ -222,7 +219,7 @@ void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
             l = psi_lookup_add_to_list(l, res, ctx->element_size);
         }
     }
-    printf("Got %u elements\n", g_slist_length(l));
+    printf("Got %u true elements\n", g_slist_length(l));
     g_slist_foreach(l, (GFunc) psi_write_and_show, true_res);
 }
 
@@ -231,7 +228,9 @@ GSList * psi_lookup_add_to_list(GSList * l, char * elem, uint8_t e_size) {
 }
 
 void psi_write_and_show(char * elem, FILE * f) {
-    if (fwrite(elem, strlen(elem), 1, f) < 1)
+    static char tmp[128];
+    snprintf(tmp, 127, "%s\n", elem);
+    if (fwrite(tmp, strlen(tmp), 1, f) < 1)
         printf("Error writing to result_true\n");
     printf("%s\n", elem);
 }

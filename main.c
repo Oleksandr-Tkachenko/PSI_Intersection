@@ -20,10 +20,10 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx);
  * 
  */
 int main(int argc, char** argv) {
-if(argc==1){
-printf("PSI Intersection\n");
-return(EXIT_FAILURE);
-}
+    if (argc == 1) {
+        printf("PSI Intersection\n");
+        return (EXIT_FAILURE);
+    }
     PSI_INTERSECTION_CTX ctx[1];
     ctx->result = NULL;
     parse_argv(argc, argv, ctx);
@@ -36,11 +36,11 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
     opterr = 0;
     while ((c = getopt(argc, argv, "l:p:e:n:q:r:s:t:a:b:")) != -1)
         switch (c) {
+            case 'p':
+                strncpy(ctx->path_result, optarg, 128);
+                break;
             case 'e':
                 ctx->element_size = atoi(optarg);
-                break;
-            case 'p':
-                strncpy(ctx->path_root, optarg, 128);
                 break;
             case 'n':
                 ctx->bucket_n = atoi(optarg);
