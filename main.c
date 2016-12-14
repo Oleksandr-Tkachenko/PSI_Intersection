@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
     int index, c;
     opterr = 0;
-    while ((c = getopt(argc, argv, "l:p:e:n:q:r:s:t:a:b:")) != -1)
+    while ((c = getopt(argc, argv, "l:p:e:n:q:m:r:s:t:a:b:c:x:")) != -1)
         switch (c) {
             case 'p':
                 strncpy(ctx->path_result, optarg, 128);
@@ -48,6 +48,22 @@ int parse_argv(int argc, char** argv, PSI_INTERSECTION_CTX* ctx) {
             case 'l':
                 ctx->lookup = TRUE;
                 strncpy(ctx->path_lookup, optarg, 128);
+                break;
+            case 'c':
+                strncpy(ctx->path_lookup_cuckoo, optarg, 128);
+                break;
+            case 'm':
+                strncpy(ctx->path_lookup_masks, optarg, 128);
+                break;
+            case 'x':
+                if (strcmp("OT", optarg) == 0)
+                    ctx->protocol = PSI_OT;
+                else if (strcmp("NH", optarg) == 0)
+                    ctx->protocol = PSI_NH;
+                else {
+                    printf("Unknwon communication protocols. Resetting to Naive Hashing\n");
+                    ctx->protocol = PSI_NH;
+                }
                 break;
             case 'q':
                 ctx->queue_buffer_size = atoi(optarg);

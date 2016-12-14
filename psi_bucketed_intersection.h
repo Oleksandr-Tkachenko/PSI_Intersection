@@ -34,9 +34,12 @@ extern "C" {
     void psi_destroy_buckets(PSI_INTERSECTION_CTX* ctx);
     void show_settings(PSI_INTERSECTION_CTX* ctx);
     void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx);
+    void psi_intersection_lookup_nh(PSI_INTERSECTION_CTX* ctx);
+    void psi_intersection_lookup_ot(PSI_INTERSECTION_CTX* ctx);
     GSList * psi_lookup_add_to_list(GSList * l, char * elem, uint8_t e_size);
     void psi_write_and_show(char * elem, FILE * f);
-
+    GSList * g_slist_dump(GSList * l, FILE * f);
+    void psi_intersection_elem_dump(char * elem, FILE * f);
 #ifdef __cplusplus
 }
 #endif

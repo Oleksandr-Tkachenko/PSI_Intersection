@@ -24,7 +24,7 @@ extern "C" {
     gboolean is_in_hash_table(GHashTable * t, char * element);
     gboolean hash_table_insert(GHashTable * t, char * element);
     char ** slice_alloc_char_buffer_new(size_t n1, size_t n2);
-
+    gboolean is_empty(uint8_t * a, uint n);
 
 #ifdef __cplusplus
 }

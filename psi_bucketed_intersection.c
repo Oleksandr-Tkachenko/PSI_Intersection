@@ -1,5 +1,8 @@
 #include "psi_bucketed_intersection.h"
 
+int psi_intersection_strcmp(gconstpointer a, gconstpointer b);
+GSList * psi_intersection_unique_elems(GSList * l);
+
 void psi_bucketed_intersection(PSI_INTERSECTION_CTX* ctx) {
 
     show_settings(ctx);
@@ -68,14 +71,14 @@ void psi_split_single(gboolean a, PSI_INTERSECTION_CTX* ctx) {
     for (size_t i = 0; i < size / ctx->element_size; i++) {
         if (fread(element, ctx->element_size, 1, f) < 1)
             printf("Error parsing elements\n");
-        psi_get_64bit_sha256(element, &bucket_n);
+        psi_get_64bit_sha256(element, &bucket_n, ctx->element_size);
         bucket_n /= divisor;
         add_elem_to_queue(a, ctx, element, bucket_n);
     }
 }
 
 void psi_buckets_intersection(PSI_INTERSECTION_CTX* ctx) {
-
+    FILE * f = psi_try_fopen(ctx->path_result, "w");
 #pragma omp parallel for shared(ctx) num_threads(ctx->threads)
     for (size_t i = 0; i < ctx->bucket_n; i++) {
         char path_a[64];
@@ -95,25 +98,22 @@ void psi_buckets_intersection(PSI_INTERSECTION_CTX* ctx) {
         if (simple_ctx->result != NULL)
 #pragma omp critical
         {
-            ctx->result = g_slist_concat(ctx->result, simple_ctx->result);
+            ctx->result = g_slist_concat(simple_ctx->result, ctx->result);
         }
     }
 
     if (g_slist_length(ctx->result) == 0)
         printf("No elements in intersection\n");
     else {
-        printf("%u elements in intersection\n", g_slist_length(ctx->result));
-        FILE * f = fopen(ctx->path_result, "w");
-        if (f == NULL)
-            printf("Error writing result to file\n");
-        g_slist_foreach(ctx->result, (GFunc) print_result, f);
-        fclose(f);
+        ctx->result = psi_intersection_unique_elems(ctx->result);
+        printf("%u unique elements in intersection\n", g_slist_length(ctx->result));
+        printf("Writing to %s\n", ctx->path_result);
+        g_slist_foreach(ctx->result, (GFunc) psi_intersection_elem_dump, f);
     }
-
+    fclose(f);
 }
 
 void save_all_queues(PSI_INTERSECTION_CTX* ctx, gboolean a) {
-    //char buffer[128];
     for (size_t i = 0; i < ctx->bucket_n; i++)
         save_queue(a, ctx->queues[i], ctx->path_folder_buckets, i, ctx->element_size);
 }
@@ -189,12 +189,19 @@ void show_settings(PSI_INTERSECTION_CTX* ctx) {
 }
 
 void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
+    if (ctx->protocol == PSI_NH)
+        psi_intersection_lookup_nh(ctx);
+    else
+        psi_intersection_lookup_ot(ctx);
+}
+
+void psi_intersection_lookup_nh(PSI_INTERSECTION_CTX* ctx) {
     GSList * l = NULL;
     FILE * res = psi_try_fopen(ctx->path_result, "rb");
     FILE * lookup = psi_try_fopen(ctx->path_lookup, "rb");
     char tmp[140], lookup_buf[33];
     strncat(tmp, ctx->path_result, 120);
-    strcat(tmp, "_res_true");
+    strcat(tmp, "_true");
     printf("Writing true intersection elements to %s\n", tmp);
     FILE * true_res = psi_try_fopen(tmp, "wb");
 
@@ -209,8 +216,9 @@ void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
         if (!hash_table_insert(t, c_buf))
             printf("Collision by inserting new element to hash table %s\n", c_buf);
     }
+
     while (fread(elem, ctx->element_size, 1, lookup) > 0) {
-        get_16_bit_sha256(elem, hash);
+        get_16_byte_sha256(elem, hash, ctx->element_size);
         bytes_to_chars(hash, lookup_buf, 16);
         lookup_buf[32] = '\0';
         if (is_in_hash_table(t, lookup_buf)) {
@@ -219,8 +227,87 @@ void psi_intersection_lookup(PSI_INTERSECTION_CTX* ctx) {
             l = psi_lookup_add_to_list(l, res, ctx->element_size);
         }
     }
+
     printf("Got %u true elements\n", g_slist_length(l));
-    g_slist_foreach(l, (GFunc) psi_write_and_show, true_res);
+    g_slist_foreach(l, (GFunc) psi_intersection_elem_dump, true_res);
+}
+
+void psi_intersection_lookup_ot(PSI_INTERSECTION_CTX* ctx) {
+    size_t cuckoo_el_size = 19, masks_el_size = ctx->element_size, init_elem_size = 16;
+
+    GSList *masks_l = NULL;
+    //result masks
+    FILE * res = psi_try_fopen(ctx->path_result, "r");
+    FILE * lookup_cuckoo = psi_try_fopen(ctx->path_lookup_cuckoo, "rb");
+    FILE * lookup_masks = psi_try_fopen(ctx->path_lookup_masks, "rb");
+
+    char tmp[140], masks_buf[masks_el_size * 2 + 1];
+    //char lookup_buf[init_elem_size * 2 + 1];
+    tmp[0] = '\0';
+    strncat(tmp, ctx->path_result, 120);
+    strcat(tmp, "_true");
+    printf("Writing true intersection elements to %s\n", tmp);
+    FILE * true_res = psi_try_fopen(tmp, "wb");
+    GHashTable * t = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
+    //uint8_t elem[ctx->element_size];
+    //uint8_t hash[16];
+
+    GHashTable * masks_t = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
+    uint8_t buf[masks_el_size];
+
+    fseeko(res, 0, SEEK_SET);
+    //add elements for looking up indexes
+    while (1) {
+        char * c_buf = (char*) malloc((masks_el_size * 2 + 1) * sizeof*c_buf);
+        if (fread(buf, masks_el_size * 2, 1, res) < 1)
+            break;
+        memcpy(c_buf, buf, masks_el_size * 2);
+        c_buf[masks_el_size * 2] = '\0';
+        fseeko(res, 1, SEEK_CUR);
+        if (strlen(c_buf) == masks_el_size * 2 && !hash_table_insert(masks_t, c_buf)) {
+            printf("Collision occured by inserting new element to mask table %s\n", c_buf);
+            for (size_t i = 0; i < masks_el_size * 2; i++)
+                printf("%c", c_buf[i]);
+            printf("\n");
+        }
+    }
+
+    //find indexes and save according elements from cuckoo table
+    while (1) {
+        if (fread(buf, masks_el_size, 1, lookup_masks) < 1)
+            break;
+        bytes_to_chars(buf, masks_buf, masks_el_size);
+        masks_buf[masks_el_size * 2] = '\0';
+
+        if (is_in_hash_table(masks_t, masks_buf)) {
+            uint64_t * r = malloc(sizeof*r);
+            *r = (ftello(lookup_masks) - masks_el_size) / masks_el_size;
+            masks_l = g_slist_prepend(masks_l, r);
+        }
+    }
+
+    fclose(res);
+    //overwriting result file with cuckoo table elements
+    GSList * e = masks_l;
+    uint8_t cuckoo_read_buf[init_elem_size];
+    char cuckoo_write_buf[init_elem_size * 2 + 1];
+    while (e != NULL) {
+        fseeko(lookup_cuckoo, *((uint64_t*) (e->data)) * cuckoo_el_size, SEEK_SET);
+        if (fread(cuckoo_read_buf, init_elem_size, 1, lookup_cuckoo) < 1)
+            printf("Error reading cuckoo element from cuckoo table for lookup\n");
+        bytes_to_chars(cuckoo_read_buf, cuckoo_write_buf, init_elem_size);
+        cuckoo_write_buf[init_elem_size * 2] = '\n';
+        if (fwrite(cuckoo_write_buf, init_elem_size * 2 + 1, 1, true_res) < 1)
+            printf("Error writing cuckoo element to result file\n");
+        e = e->next;
+    }
+
+    e = NULL;
+    g_slist_free_full(masks_l, free);
+    g_hash_table_destroy(masks_t);
+
+    fclose(true_res);
+    g_hash_table_destroy(t);
 }
 
 GSList * psi_lookup_add_to_list(GSList * l, char * elem, uint8_t e_size) {
@@ -233,4 +320,34 @@ void psi_write_and_show(char * elem, FILE * f) {
     if (fwrite(tmp, strlen(tmp), 1, f) < 1)
         printf("Error writing to result_true\n");
     printf("%s\n", elem);
+}
+
+GSList * psi_intersection_unique_elems(GSList * l) {
+    GSList * res = NULL;
+    GSList * i = l;
+    while (i != NULL) {
+        if (res == NULL) res = g_slist_prepend(res, i->data);
+        else if (g_slist_find_custom(res, (char*) i->data, psi_intersection_strcmp));
+        else
+            res = g_slist_prepend(res, i->data);
+        i = i->next;
+    }
+    return res;
+}
+
+int psi_intersection_strcmp(gconstpointer a, gconstpointer b) {
+    return strcmp((char*) a, (char*) b);
+}
+
+GSList * g_slist_dump(GSList * l, FILE * f) {
+    g_slist_foreach(l, (GFunc) psi_intersection_elem_dump, (gpointer) f);
+    g_slist_free_full(l, free);
+    return NULL;
+}
+
+void psi_intersection_elem_dump(char * elem, FILE * f) {
+    static char tmp[128];
+    snprintf(tmp, 127, "%s\n", elem);
+    if (fwrite(tmp, strlen(tmp), 1, f) < 1)
+        printf("Error writing to result_true\n");
 }

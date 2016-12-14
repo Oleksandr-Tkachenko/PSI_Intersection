@@ -48,7 +48,7 @@ void psi_simple_intersection_insert(GHashTable * t, FILE* f, char ** buffer, off
         if (fread(hash_buffer, es, 1, f) < 1)
             break;
         bytes_to_chars(hash_buffer, buffer[i], es);
-        if (!hash_table_insert(t, buffer[i]))
+        if (!is_empty(hash_buffer, es) && !hash_table_insert(t, buffer[i]))
             printf("Collision by inserting new element to hash table %s\n", buffer[i]);
     }
 }
@@ -60,10 +60,10 @@ void psi_simple_intersection_check(GHashTable * t, FILE * f, GSList ** result, o
         if (fread(hash_buffer, es, 1, f) < 1)
             break;
         bytes_to_chars(hash_buffer, str_buffer, es);
-        if (is_in_hash_table(t, str_buffer)) {
+        if (!is_empty(hash_buffer, es) && is_in_hash_table(t, str_buffer)) {
             char* element = (char*) malloc(sizeof (char) * (es * 2 + 1));
             strncpy(element, str_buffer, es * 2);
-            element[es*2] = '\0';
+            element[es * 2] = '\0';
             *result = g_slist_append(*result, element);
         }
     }
@@ -84,4 +84,11 @@ char ** slice_alloc_char_buffer_new(size_t n1, size_t n2) {
     for (size_t i = 0; i < n1; i++)
         buffer[i] = g_slice_alloc(n2);
     return buffer;
+}
+
+gboolean is_empty(uint8_t * a, uint n) {
+    for (size_t i = 0; i < n; i++)
+        if (a[i] != 0)
+            return FALSE;
+    return TRUE;
 }
