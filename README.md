@@ -27,7 +27,10 @@ Now intersection between bucket pairs can be calculated in RAM in parallel,
 results of which are concatenated.
 
 
-__Install:__ sudo make install
+__Install:__ 
+```
+sudo make install
+```
 __Remove:__ 
 ```
 sudo make remove
@@ -39,12 +42,10 @@ sudo make remove
  * lpsi-util
  * libssl-dev
 
-__Remove:__ sudo make remove
-
-__Dependencies:__ libglib2.0-dev, _lpsi-util_, libssl-dev
-
-__Usage:__ 
-_psi-intersection_ 
+###Usage: 
+```
+psi-intersection
+```
 * -e _element size_ Byte size of the elements
 * -p _"path result"_ Path to the output file
 * -a _"path to file a"_ Path to file A
@@ -59,8 +60,3 @@ Oblivious Transfer or Naive Hashing.
 * -l _path to lookup file_ Path to the lookup file in NH protocol.
 * -m _path to masks_ Path to the client's masks in OT protocol
 * -c _path to cuckoo table_  Path to the original Cuckoo Hashing table.
-###Usage:
----
-```
-psi-intersection -e element size -p path result -a path to a -b path to b -s path to buckets -n number of buckets -q queue buffer size -r read buffer size -t number of threads
-```
